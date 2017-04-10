@@ -7,7 +7,7 @@
 
 ## 開発環境
 
-Windows7 - VisualStudio2015 C#
+Windows7 - VisualStudio2015 C#  
 Python 3.5.1 (バッチ処理用、ビルドには依存しない)
 
 ## 利用しているもの
