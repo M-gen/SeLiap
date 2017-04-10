@@ -1,0 +1,4 @@
+﻿Main.URL http://www.nicovideo.jp/watch/sm30833402
+Main.列挙スタイル 重複する名前は、x[数字] で表記する
+Main.敬称.CheckBox False
+Main.敬称.Text 様
