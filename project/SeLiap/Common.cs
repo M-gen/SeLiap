@@ -251,7 +251,7 @@ namespace MyLauncher
         // ファイル名を取得
         static public string GetFileName(string str)
         {
-            var name = str.Substring(str.LastIndexOf('\\') + 1);
+            var name = str.Substring(str.LastIndexOf(@"/") + 1);
             name = name.Substring(0, name.LastIndexOf('.'));
             return name;
         }

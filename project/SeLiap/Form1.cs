@@ -13,6 +13,9 @@ using MyLauncher;
 using System.Net;
 using System.IO;
 
+using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
+
 namespace SeLiap
 {
     public partial class Form1 : Form
@@ -60,6 +63,7 @@ namespace SeLiap
 
         string config_file = @"config.txt";
         List<Common.ConfigConectUI> config_conect_ui = new List<Common.ConfigConectUI>(); // 設定とUIの接続と保存・読み込みの汎用化
+        PublicityLog log;
 
         public Form1()
         {
@@ -106,11 +110,77 @@ namespace SeLiap
             {
                 textBox2.Enabled = false;
             }
+
+            // DataGridView系の操作
+            //this.dataGridView1.Rows.Add("削除", "山田　太郎", 28);
+            //this.dataGridView1.Rows.Add("削除", "鈴木　衛\nかもかもえいえい", 47);
+            //this.dataGridView1.Rows.Add("削除", "斉藤　花子", 32);
+            //this.dataGridView1.Rows.Add("削除", "田中　美恵", 50);
+            //セルの内容に合わせて、行の高さが自動的に調節されるようにする
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
+            //"Column1"列のセルのテキストを折り返して表示する
+            dataGridView1.Columns["Column1"].DefaultCellStyle.WrapMode =
+                DataGridViewTriState.True;
+            dataGridView1.Columns["Column2"].DefaultCellStyle.WrapMode =
+                DataGridViewTriState.True;
+
+
+            {
+                var files = System.IO.Directory.GetFiles(@"script/01_list_create/", "*.py", System.IO.SearchOption.AllDirectories);
+                var cb = comboBox2;
+                foreach( var f in files)
+                {
+                    cb.Items.Add(CommonFiles.GetFileName(f));
+                }
+            }
+            {
+                var files = System.IO.Directory.GetFiles(@"script/02_list_view/", "*.py", System.IO.SearchOption.AllDirectories);
+            }
+
+
+            Analyze(@"http://www.nicovideo.jp/watch/sm30971150?vid=xxx&xxxxxx&yyyy");
+        }
+
+        private void Analyze( string url_source )
+        {
+            var dgv = dataGridView1;
+            dgv.RowHeadersVisible = false;
+            log = new PublicityLog(richTextBox2);
+            var pa = new PublicityAnalyze(log);
+            pa.Analyze(url_source);
+
+            // 加工
+            pa.publicitys.Clear();
+            {
+                var script_path = @"script/01_list_create/02_同名を統合.py";
+
+                var script_engine = Python.CreateEngine();
+                var script_scope = script_engine.CreateScope();
+                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                script.CreateList( pa.none_effect_publicitys, pa.publicitys);
+            }
+
+            // 敬称設定の反映
+            var keishou = "";
+            if (checkBox1.Checked)
+            {
+                keishou = textBox2.Text;
+            }
+
+            {
+                var script_path = @"script/02_list_view/01_デフォルト.py";
+
+                var script_engine = Python.CreateEngine();
+                var script_scope = script_engine.CreateScope();
+                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                script.View(dgv, keishou, pa.publicitys);
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-
             string sm_id = textBox1.Text;
             var sm_id_start = sm_id.IndexOf("sm");
             if (sm_id_start >= 0 )
@@ -323,6 +393,30 @@ namespace SeLiap
                         i += 1;
                     }
                 }
+                else if (src.Substring(pos, 1) == "&")
+                {
+                    if (src.Substring(pos, 5) == "&amp;")
+                    {
+                        res += @"&";
+                        i += 4;
+                    }
+                    else if (src.Substring(pos, 6) == "&quot;")
+                    {
+                        res += "\"";
+                        i += 5;
+                    }
+                    else if (src.Substring(pos, 6) == "&#039;")
+                    {
+                        res += "'";
+                        i += 5;
+                    }
+                    else
+                    {
+                        // todo:err
+                        res += @"&";
+                        i += 0;
+                    }
+                }
                 else
                 {
                     res += src.Substring(pos, 1);
@@ -418,6 +512,26 @@ namespace SeLiap
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
             Common.SaveConfig(config_file, config_conect_ui);
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+        }
+
+        private void dataGridView1_CellStateChanged(object sender, DataGridViewCellStateChangedEventArgs e)
+        {
+
+            var dgv = (DataGridView)sender;
+            if (dgv.SelectedCells.Count == 1)
+            {
+                var text = (string)dgv.SelectedCells[0].Value;
+                if (text != "")
+                {
+                    Clipboard.SetText(text);
+                    log.WriteLine("クリップボードへコピー > " + text);
+                    dgv.Focus();
+                }
+            }
         }
     }
 
