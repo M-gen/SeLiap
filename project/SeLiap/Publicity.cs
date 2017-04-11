@@ -41,7 +41,11 @@ namespace SeLiap
         public void WriteLine( string log )
         {
             log_output_target.Focus();
-            log_output_target.AppendText(log + System.Environment.NewLine);
+            if (log_output_target.Text!="")
+            {
+                log_output_target.AppendText(System.Environment.NewLine);
+            }
+            log_output_target.AppendText(log);
 
             //log_output_target.Text += log + "\n";
         }

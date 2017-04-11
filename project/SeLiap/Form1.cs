@@ -111,15 +111,10 @@ namespace SeLiap
                 textBox2.Enabled = false;
             }
 
-            // DataGridView系の操作
-            //this.dataGridView1.Rows.Add("削除", "山田　太郎", 28);
-            //this.dataGridView1.Rows.Add("削除", "鈴木　衛\nかもかもえいえい", 47);
-            //this.dataGridView1.Rows.Add("削除", "斉藤　花子", 32);
-            //this.dataGridView1.Rows.Add("削除", "田中　美恵", 50);
             //セルの内容に合わせて、行の高さが自動的に調節されるようにする
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
-            //"Column1"列のセルのテキストを折り返して表示する
+            //セルのテキストを折り返して表示する
             dataGridView1.Columns["Column1"].DefaultCellStyle.WrapMode =
                 DataGridViewTriState.True;
             dataGridView1.Columns["Column2"].DefaultCellStyle.WrapMode =
@@ -136,8 +131,21 @@ namespace SeLiap
             }
             {
                 var files = System.IO.Directory.GetFiles(@"script/02_list_view/", "*.py", System.IO.SearchOption.AllDirectories);
+                var cb = comboBox3;
+                foreach (var f in files)
+                {
+                    cb.Items.Add(CommonFiles.GetFileName(f));
+                }
             }
 
+            {
+                var files = System.IO.Directory.GetFiles(@"script/03_text_view/", "*.py", System.IO.SearchOption.AllDirectories);
+                var cb = comboBox4;
+                foreach (var f in files)
+                {
+                    cb.Items.Add(CommonFiles.GetFileName(f));
+                }
+            }
 
             Analyze(@"http://www.nicovideo.jp/watch/sm30971150?vid=xxx&xxxxxx&yyyy");
         }
@@ -175,6 +183,19 @@ namespace SeLiap
                 var script_scope = script_engine.CreateScope();
                 dynamic script = script_engine.ExecuteFile(script_path, script_scope);
                 script.View(dgv, keishou, pa.publicitys);
+            }
+
+            {
+                var rb = richTextBox1;
+                rb.Clear();
+                var script_path = @"script/03_text_view/04_1行45文字として名前を並べる(3列).py";
+
+                var script_engine = Python.CreateEngine();
+                var script_scope = script_engine.CreateScope();
+                var assist = new Assist();
+                script_scope.SetVariable("assist", assist);
+                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                script.View(rb, keishou, pa.publicitys);
             }
 
         }
@@ -533,6 +554,40 @@ namespace SeLiap
                 }
             }
         }
+
+        public class Assist
+        {
+            // 半角は1文字、全角は2文字として文字の長さを計算する
+            public int GetLenHAndF( string str )
+            {
+                var count = 0;
+                foreach( var s in str)
+                {
+                    if ( IsHalfByRegex(s.ToString()) )
+                    {
+                        count += 1;
+                    }
+                    else
+                    {
+                        count += 2;
+                    }
+                }
+                return count;
+            }
+
+            // 参考 http://hensumei.com/archives/2391
+            /// <summary>
+            /// 文字列が半角かどうかを判定します
+            /// </summary>
+            /// <remarks>半角の判定を正規表現で行います。半角カタカナは「ｦ」～半濁点を半角とみなします</remarks>
+            /// <param name="target">対象の文字列</param>
+            /// <returns>文字列が半角の場合はtrue、それ以外はfalse</returns>
+            private static bool IsHalfByRegex(string target)
+            {
+                return new System.Text.RegularExpressions.Regex("^[\u0020-\u007E\uFF66-\uFF9F]+$").IsMatch(target);
+            }
+        }
+
     }
 
     
