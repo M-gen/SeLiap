@@ -228,6 +228,16 @@ namespace SeLiap
                             res += "\"";
                             i += 5;
                         }
+                        else if (src.Substring(pos, 4) == "&lt;")
+                        {
+                            res += "<";
+                            i += 3;
+                        }
+                        else if (src.Substring(pos, 4) == "&gt;")
+                        {
+                            res += ">";
+                            i += 3;
+                        }
                         else if (src.Substring(pos, 6) == "&#039;")
                         {
                             res += "'";
