@@ -1,4 +1,6 @@
-﻿Main.URL http://www.nicovideo.jp/watch/sm30833402
-Main.列挙スタイル 重複する名前は、x[数字] で表記する
+﻿Main.URL smXXXXXXX (動画のIDを入力してください)
 Main.敬称.CheckBox False
 Main.敬称.Text 様
+Main.Script01 02_同名を統合
+Main.Script02 01_デフォルト
+Main.Script03 04_1行45文字として名前を並べる(3列)

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace MyLauncher
 {
 
-    class Common
+    public class Common
     {
         // TexBoxに簡易なファイルのドラッグ＆ドロップができるようにする
         static public void SettingTextBoxDragEvent(TextBox textbox, bool is_true)

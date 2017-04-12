@@ -20,49 +20,128 @@ namespace SeLiap
 {
     public partial class Form1 : Form
     {
-        public class ListSortStyle
+        public class Config
         {
-            public string text;
-            public enum Style
+            public class Script
             {
-                Unique,      // 重複する名前を削除
-                EqConect,    // 重複する名前は、続けてリストアップする
-                EqCount,     // 重複する名前は、x[数字] で表記する
-                Normal,      // 重複削除せず(未加工)
-                OldUniue,    // 逆順、重複する名前を削除
-                OldEqConect, // 逆順、重複する名前は、続けてリストアップする
-                OldEqCount,  // 逆順、重複する名前は、x[数字] で表記する
-            }
-            public Style style;
-            public ListSortStyle(string text, Style style)
-            {
-                this.text = text;
-                this.style = style;
+                Config config;
+                public string dir       = "";    
+                public string file_name = "";
+                public string foot      = ".py";
+                public ComboBox combobox = null;
+
+
+                public Script(Config config, string dir, ComboBox combobox )
+                {
+                    this.config = config;
+                    this.dir = dir;
+                    this.combobox = combobox;
+
+                    var files = System.IO.Directory.GetFiles(dir, "*"+foot, System.IO.SearchOption.AllDirectories);
+                    foreach (var f in files)
+                    {
+                        this.combobox.Items.Add(CommonFiles.GetFileName(f));
+                    }
+
+                    this.combobox.SelectedIndexChanged += comboBox_SelectedIndexChanged;
+                }
+
+                public string GetPath()
+                {
+                    return dir + file_name + foot;
+                }
+
+                private void comboBox_SelectedIndexChanged(object sender, EventArgs e)
+                {
+                    file_name = ((ComboBox)sender).Text;
+                    Common.SaveConfig(config.config_file, config.config_conect_ui);
+                }
+
             }
 
-            public override string ToString()
+            public Script script_01;
+            public Script script_02;
+            public Script script_03;
+            public string config_file = "";
+            public List<Common.ConfigConectUI> config_conect_ui = new List<Common.ConfigConectUI>();
+
+            public Config(string config_file, ComboBox[] comboboxs, TextBox text_box_1, CheckBox check_box_1, TextBox text_box_2)
             {
-                return text;
+                this.config_file = config_file;
+                script_01 = new Script(this, @"script/01_list_create/", comboboxs[0]);
+                script_02 = new Script(this, @"script/02_list_view/", comboboxs[1]);
+                script_03 = new Script(this, @"script/03_text_view/", comboboxs[2]);
+
+                config_conect_ui.Add(new Common.ConfigConectUI("Main.URL", text_box_1));
+                config_conect_ui.Add(new Common.ConfigConectUI("Main.敬称.CheckBox", check_box_1));
+                config_conect_ui.Add(new Common.ConfigConectUI("Main.敬称.Text", text_box_2));
+                config_conect_ui.Add(new Common.ConfigConectUI("Main.Script01", comboboxs[0]));
+                config_conect_ui.Add(new Common.ConfigConectUI("Main.Script02", comboboxs[1]));
+                config_conect_ui.Add(new Common.ConfigConectUI("Main.Script03", comboboxs[2]));
+            }
+
+            public void InitLoad()
+            {
+                try { 
+                    Common.LoadConfig(config_file, config_conect_ui);
+                }
+                catch
+                {   // ファイルがなくロードできないことがあるので
+                    //list_sort_style = list_sort_styles[0];
+                    //comboBox1.Text = list_sort_style.ToString();
+                    script_01.combobox.Text = "02_同名を統合";
+                    script_02.combobox.Text = "01_デフォルト";
+                    script_03.combobox.Text = "04_1行45文字として名前を並べる(3列)";
+                    
+                }
             }
         }
 
-        public class Sendensha
-        {
-            public string name;
-            public int counter;
-            public Sendensha( string name)
-            {
-                this.name = name;
-                counter = 1;
-            }
-        }
+        //public class ListSortStyle
+        //{
+        //    public string text;
+        //    public enum Style
+        //    {
+        //        Unique,      // 重複する名前を削除
+        //        EqConect,    // 重複する名前は、続けてリストアップする
+        //        EqCount,     // 重複する名前は、x[数字] で表記する
+        //        Normal,      // 重複削除せず(未加工)
+        //        OldUniue,    // 逆順、重複する名前を削除
+        //        OldEqConect, // 逆順、重複する名前は、続けてリストアップする
+        //        OldEqCount,  // 逆順、重複する名前は、x[数字] で表記する
+        //    }
+        //    public Style style;
+        //    public ListSortStyle(string text, Style style)
+        //    {
+        //        this.text = text;
+        //        this.style = style;
+        //    }
 
-        ListSortStyle list_sort_style = null;
-        List<ListSortStyle> list_sort_styles = new List<ListSortStyle>();
-        List<Sendensha> sendenshas = new List<Sendensha>();
+        //    public override string ToString()
+        //    {
+        //        return text;
+        //    }
+        //}
+
+        //public class Sendensha
+        //{
+        //    public string name;
+        //    public int counter;
+        //    public Sendensha( string name)
+        //    {
+        //        this.name = name;
+        //        counter = 1;
+        //    }
+        //}
+
+        Config config;
+        PublicityAnalyze pa;
+        //ListSortStyle list_sort_style = null;
+        //List<ListSortStyle> list_sort_styles = new List<ListSortStyle>();
+        //List<Sendensha> sendenshas = new List<Sendensha>();
 
         string config_file = @"config.txt";
-        List<Common.ConfigConectUI> config_conect_ui = new List<Common.ConfigConectUI>(); // 設定とUIの接続と保存・読み込みの汎用化
+        //List<Common.ConfigConectUI> config_conect_ui = new List<Common.ConfigConectUI>(); // 設定とUIの接続と保存・読み込みの汎用化
         PublicityLog log;
 
         public Form1()
@@ -72,35 +151,9 @@ namespace SeLiap
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            list_sort_styles.Add(new ListSortStyle("重複する名前を削除", ListSortStyle.Style.Unique));
-            list_sort_styles.Add(new ListSortStyle("重複する名前は、続けてリストアップする", ListSortStyle.Style.EqConect));
-            list_sort_styles.Add(new ListSortStyle("重複する名前は、x[数字] で表記する", ListSortStyle.Style.EqCount));
-            //
-            list_sort_styles.Add(new ListSortStyle("重複削除せず(未加工)",                         ListSortStyle.Style.Normal));
-            list_sort_styles.Add(new ListSortStyle("逆順、重複する名前を削除",                     ListSortStyle.Style.OldUniue));
-            list_sort_styles.Add(new ListSortStyle("逆順、重複する名前は、続けてリストアップする", ListSortStyle.Style.OldEqConect));
-            list_sort_styles.Add(new ListSortStyle("逆順、重複する名前は、x[数字] で表記する",     ListSortStyle.Style.OldEqCount));
-
-            foreach (var s in list_sort_styles)
-            {
-                comboBox1.Items.Add(s.ToString());
-            }
-
-
-            // コンフィグファイルとUIの関連付けと読み込み
-            config_conect_ui.Add(new Common.ConfigConectUI("Main.URL", textBox1));
-            config_conect_ui.Add(new Common.ConfigConectUI("Main.列挙スタイル", comboBox1));
-            config_conect_ui.Add(new Common.ConfigConectUI("Main.敬称.CheckBox", checkBox1));
-            config_conect_ui.Add(new Common.ConfigConectUI("Main.敬称.Text",     textBox2));
-            try
-            {   // ファイルがなくロードできないことがあるので
-                Common.LoadConfig(config_file, config_conect_ui);
-            }
-            catch
-            {
-                list_sort_style = list_sort_styles[0];
-                comboBox1.Text = list_sort_style.ToString();
-            }
+            ComboBox[] comboboxs = { comboBox2, comboBox3, comboBox4 };
+            config = new Config(config_file, comboboxs, textBox1, checkBox1, textBox2);
+            config.InitLoad();
 
             if (checkBox1.Checked)
             {
@@ -119,55 +172,33 @@ namespace SeLiap
                 DataGridViewTriState.True;
             dataGridView1.Columns["Column2"].DefaultCellStyle.WrapMode =
                 DataGridViewTriState.True;
+            dataGridView1.RowHeadersVisible = false;
 
+            log = new PublicityLog(richTextBox2);
 
-            {
-                var files = System.IO.Directory.GetFiles(@"script/01_list_create/", "*.py", System.IO.SearchOption.AllDirectories);
-                var cb = comboBox2;
-                foreach( var f in files)
-                {
-                    cb.Items.Add(CommonFiles.GetFileName(f));
-                }
-            }
-            {
-                var files = System.IO.Directory.GetFiles(@"script/02_list_view/", "*.py", System.IO.SearchOption.AllDirectories);
-                var cb = comboBox3;
-                foreach (var f in files)
-                {
-                    cb.Items.Add(CommonFiles.GetFileName(f));
-                }
-            }
-
-            {
-                var files = System.IO.Directory.GetFiles(@"script/03_text_view/", "*.py", System.IO.SearchOption.AllDirectories);
-                var cb = comboBox4;
-                foreach (var f in files)
-                {
-                    cb.Items.Add(CommonFiles.GetFileName(f));
-                }
-            }
-
-            Analyze(@"http://www.nicovideo.jp/watch/sm30971150?vid=xxx&xxxxxx&yyyy");
+            //Analyze(@"http://www.nicovideo.jp/watch/sm30944626?vid=xxx&xxxxxx&yyyy");
         }
 
         private void Analyze( string url_source )
         {
-            var dgv = dataGridView1;
-            dgv.RowHeadersVisible = false;
-            log = new PublicityLog(richTextBox2);
-            var pa = new PublicityAnalyze(log);
+            pa = new PublicityAnalyze(log);
             pa.Analyze(url_source);
 
-            // 加工
-            pa.publicitys.Clear();
-            {
-                var script_path = @"script/01_list_create/02_同名を統合.py";
+            ReAnalyze();
+        }
 
-                var script_engine = Python.CreateEngine();
-                var script_scope = script_engine.CreateScope();
-                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
-                script.CreateList( pa.none_effect_publicitys, pa.publicitys);
+        private void ReAnalyze()
+        {
+            if (pa == null)
+            {
+                log.WriteLine("データが一度も取得されていません");
+                return;
             }
+
+            // 準備
+            var dgv = dataGridView1;
+            dgv.Rows.Clear();
+            pa.publicitys.Clear();
 
             // 敬称設定の反映
             var keishou = "";
@@ -177,8 +208,16 @@ namespace SeLiap
             }
 
             {
-                var script_path = @"script/02_list_view/01_デフォルト.py";
+                var script_path = config.script_01.GetPath();
+                var script_engine = Python.CreateEngine();
+                var script_scope = script_engine.CreateScope();
+                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                script.CreateList(pa.none_effect_publicitys, pa.publicitys);
+            }
 
+
+            {
+                var script_path = config.script_02.GetPath();
                 var script_engine = Python.CreateEngine();
                 var script_scope = script_engine.CreateScope();
                 dynamic script = script_engine.ExecuteFile(script_path, script_scope);
@@ -188,8 +227,7 @@ namespace SeLiap
             {
                 var rb = richTextBox1;
                 rb.Clear();
-                var script_path = @"script/03_text_view/04_1行45文字として名前を並べる(3列).py";
-
+                var script_path = config.script_03.GetPath();
                 var script_engine = Python.CreateEngine();
                 var script_scope = script_engine.CreateScope();
                 var assist = new Assist();
@@ -198,181 +236,109 @@ namespace SeLiap
                 script.View(rb, keishou, pa.publicitys);
             }
 
+            toolStripStatusLabel1.Text = string.Format("宣伝者数 : {0} ※同名を統合していない場合はそれぞれ計算されます", pa.publicitys.Count);
+            log.WriteLine( "解析完了");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string sm_id = textBox1.Text;
-            var sm_id_start = sm_id.IndexOf("sm");
-            if (sm_id_start >= 0 )
-            {
-                sm_id = sm_id.Substring(sm_id_start + 2);
-            }
+            Analyze(textBox1.Text);
+            ////}
+            //var string_list = new List<string>();
+            //var offset = 0;
+            //var page_limit = 100;
+            //var num = 0;
+            //richTextBox1.Text = "";
+
+            //if (!CheckNumOnley(sm_id))
+            //{
+            //    AddLog("入力エラー");
+            //}
+            //else
+            //{
+            //    while (true)
+            //    {
+            //        var add_num = AddSendenshaStringList(ref string_list, sm_id, offset, page_limit);
+            //        if (add_num == 0) break;
+            //        num += add_num;
+            //        offset += page_limit;
+            //    }
 
             //}
-            var string_list = new List<string>();
-            var offset = 0;
-            var page_limit = 100;
-            var num = 0;
-            richTextBox1.Text = "";
-
-            if (!CheckNumOnley(sm_id))
-            {
-                AddLog("入力エラー");
-            }
-            else
-            {
-                while (true)
-                {
-                    var add_num = AddSendenshaStringList(ref string_list, sm_id, offset, page_limit);
-                    if (add_num == 0) break;
-                    num += add_num;
-                    offset += page_limit;
-                }
-
-                // リストを反転させるかどうか
-                if (IsReversList())
-                {
-                    string_list.Reverse();
-                }
-
-                sendenshas.Clear();
-                foreach (var str in string_list)
-                {
-                    var is_add = true;
-                    foreach (var s in sendenshas)
-                    {
-                        if (s.name == str)
-                        {
-                            s.counter++;
-                            is_add = false;
-                            break;
-                        }
-                    }
-                    if (is_add)
-                    {
-                        sendenshas.Add(new Sendensha(str));
-                    }
-                }
-
-
-                // 敬称設定の反映
-                var foot_text = "";
-                if ( checkBox1.Checked )
-                {
-                    foot_text = textBox2.Text;
-                }
-
-                // 出力方式に応じた出力をする
-                // Old(Revers)と取得順で多重で記述しているところが微妙...
-                switch (GetOutputStyle())
-                {
-                    case ListSortStyle.Style.Unique:
-                        foreach (var s in sendenshas)
-                        {
-                            richTextBox1.Text += s.name + foot_text + "\n";
-                        }
-                        break;
-                    case ListSortStyle.Style.EqConect:
-                        foreach (var s in sendenshas)
-                        {
-                            for (var i = 0; i < s.counter; i++)
-                            {
-                                richTextBox1.Text += s.name + foot_text + "\n";
-                            }
-                        }
-                        break;
-                    case ListSortStyle.Style.EqCount:
-                        foreach (var s in sendenshas)
-                        {
-                            if (s.counter > 1)
-                            {
-                                richTextBox1.Text += s.name + foot_text + " x" + s.counter.ToString() + "\n";
-                            }
-                            else
-                            {
-                                richTextBox1.Text += s.name + foot_text + "\n";
-                            }
-                        }
-                        break;
-                    case ListSortStyle.Style.Normal:
-                        foreach (var s in string_list)
-                        {
-                            richTextBox1.Text += s + foot_text + "\n";
-                        }
-                        break;
-                }
-
-                toolStripStatusLabel1.Text = string.Format("宣伝者数 : {0}", sendenshas.Count);
-                AddLog("sm" + sm_id + " 宣伝者の解析完了");
-            }
+            //toolStripStatusLabel1.Text = string.Format("宣伝者数 : {0}", sendenshas.Count);
+            //AddLog("sm" + sm_id + " 宣伝者の解析完了");
         }
 
-        // リストを反転させるかどうか
-        private bool IsReversList()
+        //// リストを反転させるかどうか
+        //private bool IsReversList()
+        //{
+        //    switch(list_sort_style.style)
+        //    {
+        //        default:
+        //            return false;
+        //        case ListSortStyle.Style.OldUniue:
+        //            return true;
+        //        case ListSortStyle.Style.OldEqConect:
+        //            return true;
+        //        case ListSortStyle.Style.OldEqCount:
+        //            return true;
+        //    }
+        //}
+
+        //// 出力スタイル
+        //private ListSortStyle.Style GetOutputStyle()
+        //{
+        //    switch (list_sort_style.style)
+        //    {
+        //        default:
+        //            return list_sort_style.style;
+        //        case ListSortStyle.Style.OldUniue:
+        //            return ListSortStyle.Style.Unique;
+        //        case ListSortStyle.Style.OldEqConect:
+        //            return ListSortStyle.Style.EqConect;
+        //        case ListSortStyle.Style.OldEqCount:
+        //            return ListSortStyle.Style.EqCount;
+        //    }
+        //}
+
+        //private int AddSendenshaStringList( ref List<string> string_list, string sm_id, int offset, int page_limit )
+        //{
+
+        //    var url = string.Format(@"http://uad-api.nicovideo.jp/UadsCampaignService/getAdHistoryJsonp?vid=sm{0}&offset={1}&limit={2}",sm_id,offset,page_limit);
+
+        //    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+        //    req.Method = "GET";
+
+        //    HttpWebResponse res = (HttpWebResponse)req.GetResponse();
+
+        //    Stream s = res.GetResponseStream();
+        //    StreamReader sr = new StreamReader(s);
+        //    string content = sr.ReadToEnd();
+
+        //    var num = 0;
+        //    {
+        //        var i = 0;
+        //        while (true)
+        //        {
+        //            var str_start = content.IndexOf("\"name\"", i);
+        //            if (str_start < 0) break;
+        //            var name_offset = 9;
+        //            var str_end = content.IndexOf("\"", str_start + name_offset);
+        //            var str = content.Substring(str_start + name_offset - 1, str_end - str_start - name_offset + 1);
+        //            string_list.Add(GetEndcode(str));
+        //            //Console.WriteLine("* " + str);
+        //            i = str_start + 1;
+        //            num++;
+        //            WaitSleep.Do(10);
+        //        }
+        //    }
+
+        //    return num;
+        //}
+
+        private void button2_Click(object sender, EventArgs e)
         {
-            switch(list_sort_style.style)
-            {
-                default:
-                    return false;
-                case ListSortStyle.Style.OldUniue:
-                    return true;
-                case ListSortStyle.Style.OldEqConect:
-                    return true;
-                case ListSortStyle.Style.OldEqCount:
-                    return true;
-            }
-        }
-
-        // 出力スタイル
-        private ListSortStyle.Style GetOutputStyle()
-        {
-            switch (list_sort_style.style)
-            {
-                default:
-                    return list_sort_style.style;
-                case ListSortStyle.Style.OldUniue:
-                    return ListSortStyle.Style.Unique;
-                case ListSortStyle.Style.OldEqConect:
-                    return ListSortStyle.Style.EqConect;
-                case ListSortStyle.Style.OldEqCount:
-                    return ListSortStyle.Style.EqCount;
-            }
-        }
-
-        private int AddSendenshaStringList( ref List<string> string_list, string sm_id, int offset, int page_limit )
-        {
-
-            var url = string.Format(@"http://uad-api.nicovideo.jp/UadsCampaignService/getAdHistoryJsonp?vid=sm{0}&offset={1}&limit={2}",sm_id,offset,page_limit);
-
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-            req.Method = "GET";
-
-            HttpWebResponse res = (HttpWebResponse)req.GetResponse();
-
-            Stream s = res.GetResponseStream();
-            StreamReader sr = new StreamReader(s);
-            string content = sr.ReadToEnd();
-
-            var num = 0;
-            {
-                var i = 0;
-                while (true)
-                {
-                    var str_start = content.IndexOf("\"name\"", i);
-                    if (str_start < 0) break;
-                    var name_offset = 9;
-                    var str_end = content.IndexOf("\"", str_start + name_offset);
-                    var str = content.Substring(str_start + name_offset - 1, str_end - str_start - name_offset + 1);
-                    string_list.Add(GetEndcode(str));
-                    //Console.WriteLine("* " + str);
-                    i = str_start + 1;
-                    num++;
-                    WaitSleep.Do(10);
-                }
-            }
-
-            return num;
+            ReAnalyze();
         }
 
         private string GetEndcode( string src )
@@ -498,22 +464,9 @@ namespace SeLiap
             target_control = null;
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            foreach (var s in list_sort_styles)
-            {
-                if ( comboBox1.Text==s.text )
-                {
-                    list_sort_style = s;
-                    break;
-                }
-            }
-            Common.SaveConfig(config_file, config_conect_ui);
-        }
-
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            Common.SaveConfig(config_file, config_conect_ui);
+            Common.SaveConfig(config_file, config.config_conect_ui);
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -527,12 +480,12 @@ namespace SeLiap
                 textBox2.Enabled = false;
             }
 
-            Common.SaveConfig(config_file, config_conect_ui);
+            Common.SaveConfig(config_file, config.config_conect_ui);
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            Common.SaveConfig(config_file, config_conect_ui);
+            Common.SaveConfig(config_file, config.config_conect_ui);
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -587,7 +540,6 @@ namespace SeLiap
                 return new System.Text.RegularExpressions.Regex("^[\u0020-\u007E\uFF66-\uFF9F]+$").IsMatch(target);
             }
         }
-
     }
 
     
