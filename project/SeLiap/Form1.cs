@@ -29,7 +29,7 @@ namespace SeLiap
                 public string file_name = "";
                 public string foot      = ".py";
                 public ComboBox combobox = null;
-
+                public Dictionary<string, string> conector = new Dictionary<string, string>();
 
                 public Script(Config config, string dir, ComboBox combobox )
                 {
@@ -40,7 +40,9 @@ namespace SeLiap
                     var files = System.IO.Directory.GetFiles(dir, "*"+foot, System.IO.SearchOption.AllDirectories);
                     foreach (var f in files)
                     {
-                        this.combobox.Items.Add(CommonFiles.GetFileName(f));
+                        var key = CommonFiles.GetFileName(f);
+                        this.combobox.Items.Add(key);
+                        conector.Add(key, f);
                     }
 
                     this.combobox.SelectedIndexChanged += comboBox_SelectedIndexChanged;
@@ -48,7 +50,8 @@ namespace SeLiap
 
                 public string GetPath()
                 {
-                    return dir + file_name + foot;
+                    //return dir + file_name + foot;
+                    return conector[file_name];
                 }
 
                 private void comboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -97,51 +100,9 @@ namespace SeLiap
             }
         }
 
-        //public class ListSortStyle
-        //{
-        //    public string text;
-        //    public enum Style
-        //    {
-        //        Unique,      // 重複する名前を削除
-        //        EqConect,    // 重複する名前は、続けてリストアップする
-        //        EqCount,     // 重複する名前は、x[数字] で表記する
-        //        Normal,      // 重複削除せず(未加工)
-        //        OldUniue,    // 逆順、重複する名前を削除
-        //        OldEqConect, // 逆順、重複する名前は、続けてリストアップする
-        //        OldEqCount,  // 逆順、重複する名前は、x[数字] で表記する
-        //    }
-        //    public Style style;
-        //    public ListSortStyle(string text, Style style)
-        //    {
-        //        this.text = text;
-        //        this.style = style;
-        //    }
-
-        //    public override string ToString()
-        //    {
-        //        return text;
-        //    }
-        //}
-
-        //public class Sendensha
-        //{
-        //    public string name;
-        //    public int counter;
-        //    public Sendensha( string name)
-        //    {
-        //        this.name = name;
-        //        counter = 1;
-        //    }
-        //}
-
         Config config;
         PublicityAnalyze pa;
-        //ListSortStyle list_sort_style = null;
-        //List<ListSortStyle> list_sort_styles = new List<ListSortStyle>();
-        //List<Sendensha> sendenshas = new List<Sendensha>();
-
         string config_file = @"config.txt";
-        //List<Common.ConfigConectUI> config_conect_ui = new List<Common.ConfigConectUI>(); // 設定とUIの接続と保存・読み込みの汎用化
         PublicityLog log;
 
         public Form1()
@@ -208,31 +169,20 @@ namespace SeLiap
             }
 
             {
-                var script_path = config.script_01.GetPath();
-                var script_engine = Python.CreateEngine();
-                var script_scope = script_engine.CreateScope();
-                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                dynamic script = GetScript(config.script_01.GetPath());
                 script.CreateList(pa.none_effect_publicitys, pa.publicitys);
             }
 
 
             {
-                var script_path = config.script_02.GetPath();
-                var script_engine = Python.CreateEngine();
-                var script_scope = script_engine.CreateScope();
-                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                dynamic script = GetScript(config.script_02.GetPath());
                 script.View(dgv, keishou, pa.publicitys);
             }
 
             {
                 var rb = richTextBox1;
                 rb.Clear();
-                var script_path = config.script_03.GetPath();
-                var script_engine = Python.CreateEngine();
-                var script_scope = script_engine.CreateScope();
-                var assist = new Assist();
-                script_scope.SetVariable("assist", assist);
-                dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+                dynamic script = GetScript(config.script_03.GetPath());
                 script.View(rb, keishou, pa.publicitys);
             }
 
@@ -240,178 +190,97 @@ namespace SeLiap
             log.WriteLine( "解析完了");
         }
 
+        private dynamic GetScript( string script_path )
+        {
+            var assist = new Assist();
+            var script_engine = Python.CreateEngine();
+            var script_scope = script_engine.CreateScope();
+            script_scope.SetVariable("assist", assist);
+            dynamic script = script_engine.ExecuteFile(script_path, script_scope);
+            return script;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             Analyze(textBox1.Text);
-            ////}
-            //var string_list = new List<string>();
-            //var offset = 0;
-            //var page_limit = 100;
-            //var num = 0;
-            //richTextBox1.Text = "";
-
-            //if (!CheckNumOnley(sm_id))
-            //{
-            //    AddLog("入力エラー");
-            //}
-            //else
-            //{
-            //    while (true)
-            //    {
-            //        var add_num = AddSendenshaStringList(ref string_list, sm_id, offset, page_limit);
-            //        if (add_num == 0) break;
-            //        num += add_num;
-            //        offset += page_limit;
-            //    }
-
-            //}
-            //toolStripStatusLabel1.Text = string.Format("宣伝者数 : {0}", sendenshas.Count);
-            //AddLog("sm" + sm_id + " 宣伝者の解析完了");
         }
-
-        //// リストを反転させるかどうか
-        //private bool IsReversList()
-        //{
-        //    switch(list_sort_style.style)
-        //    {
-        //        default:
-        //            return false;
-        //        case ListSortStyle.Style.OldUniue:
-        //            return true;
-        //        case ListSortStyle.Style.OldEqConect:
-        //            return true;
-        //        case ListSortStyle.Style.OldEqCount:
-        //            return true;
-        //    }
-        //}
-
-        //// 出力スタイル
-        //private ListSortStyle.Style GetOutputStyle()
-        //{
-        //    switch (list_sort_style.style)
-        //    {
-        //        default:
-        //            return list_sort_style.style;
-        //        case ListSortStyle.Style.OldUniue:
-        //            return ListSortStyle.Style.Unique;
-        //        case ListSortStyle.Style.OldEqConect:
-        //            return ListSortStyle.Style.EqConect;
-        //        case ListSortStyle.Style.OldEqCount:
-        //            return ListSortStyle.Style.EqCount;
-        //    }
-        //}
-
-        //private int AddSendenshaStringList( ref List<string> string_list, string sm_id, int offset, int page_limit )
-        //{
-
-        //    var url = string.Format(@"http://uad-api.nicovideo.jp/UadsCampaignService/getAdHistoryJsonp?vid=sm{0}&offset={1}&limit={2}",sm_id,offset,page_limit);
-
-        //    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-        //    req.Method = "GET";
-
-        //    HttpWebResponse res = (HttpWebResponse)req.GetResponse();
-
-        //    Stream s = res.GetResponseStream();
-        //    StreamReader sr = new StreamReader(s);
-        //    string content = sr.ReadToEnd();
-
-        //    var num = 0;
-        //    {
-        //        var i = 0;
-        //        while (true)
-        //        {
-        //            var str_start = content.IndexOf("\"name\"", i);
-        //            if (str_start < 0) break;
-        //            var name_offset = 9;
-        //            var str_end = content.IndexOf("\"", str_start + name_offset);
-        //            var str = content.Substring(str_start + name_offset - 1, str_end - str_start - name_offset + 1);
-        //            string_list.Add(GetEndcode(str));
-        //            //Console.WriteLine("* " + str);
-        //            i = str_start + 1;
-        //            num++;
-        //            WaitSleep.Do(10);
-        //        }
-        //    }
-
-        //    return num;
-        //}
 
         private void button2_Click(object sender, EventArgs e)
         {
             ReAnalyze();
         }
 
-        private string GetEndcode( string src )
-        {
-            string res = "";
+        //private string GetEndcode( string src )
+        //{
+        //    string res = "";
 
-            var size = src.Length;
-            for (var i = 0; i < size; i++)
-            {
-                var pos = i;
-                if (src.Substring(pos, 1) == "\\")
-                {
-                    if (src.Substring(pos, 2) == "\\u")
-                    {
+        //    var size = src.Length;
+        //    for (var i = 0; i < size; i++)
+        //    {
+        //        var pos = i;
+        //        if (src.Substring(pos, 1) == "\\")
+        //        {
+        //            if (src.Substring(pos, 2) == "\\u")
+        //            {
 
-                        var s = src.Substring(pos + 2, 4);
-                        int code16 = Convert.ToInt32(s, 16);
-                        char c = Convert.ToChar(code16);  // 数値(文字コード) -> 文字
-                        string new_char = c.ToString();
-                        res += new_char;
-                        i += 5;
-                    }
-                    else if (src.Substring(pos, 2) == "\\/")
-                    {
-                        res += @"/";
-                        i += 1;
-                    }
-                    else if (src.Substring(pos, 2) == "\\\\")
-                    {
-                        res += @"\";
-                        i += 1;
-                    }
-                    else
-                    {
-                        //Console.WriteLine("err " + src);
-                        //richTextBox2.Text += "解析できない宣伝者名がありました " + src;
-                        AddLog("解析できない宣伝者名がありました " + src);
-                        res += @"/";
-                        i += 1;
-                    }
-                }
-                else if (src.Substring(pos, 1) == "&")
-                {
-                    if (src.Substring(pos, 5) == "&amp;")
-                    {
-                        res += @"&";
-                        i += 4;
-                    }
-                    else if (src.Substring(pos, 6) == "&quot;")
-                    {
-                        res += "\"";
-                        i += 5;
-                    }
-                    else if (src.Substring(pos, 6) == "&#039;")
-                    {
-                        res += "'";
-                        i += 5;
-                    }
-                    else
-                    {
-                        // todo:err
-                        res += @"&";
-                        i += 0;
-                    }
-                }
-                else
-                {
-                    res += src.Substring(pos, 1);
-                }
-            }
+        //                var s = src.Substring(pos + 2, 4);
+        //                int code16 = Convert.ToInt32(s, 16);
+        //                char c = Convert.ToChar(code16);  // 数値(文字コード) -> 文字
+        //                string new_char = c.ToString();
+        //                res += new_char;
+        //                i += 5;
+        //            }
+        //            else if (src.Substring(pos, 2) == "\\/")
+        //            {
+        //                res += @"/";
+        //                i += 1;
+        //            }
+        //            else if (src.Substring(pos, 2) == "\\\\")
+        //            {
+        //                res += @"\";
+        //                i += 1;
+        //            }
+        //            else
+        //            {
+        //                //Console.WriteLine("err " + src);
+        //                //richTextBox2.Text += "解析できない宣伝者名がありました " + src;
+        //                AddLog("解析できない宣伝者名がありました " + src);
+        //                res += @"/";
+        //                i += 1;
+        //            }
+        //        }
+        //        else if (src.Substring(pos, 1) == "&")
+        //        {
+        //            if (src.Substring(pos, 5) == "&amp;")
+        //            {
+        //                res += @"&";
+        //                i += 4;
+        //            }
+        //            else if (src.Substring(pos, 6) == "&quot;")
+        //            {
+        //                res += "\"";
+        //                i += 5;
+        //            }
+        //            else if (src.Substring(pos, 6) == "&#039;")
+        //            {
+        //                res += "'";
+        //                i += 5;
+        //            }
+        //            else
+        //            {
+        //                // todo:err
+        //                res += @"&";
+        //                i += 0;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            res += src.Substring(pos, 1);
+        //        }
+        //    }
 
-            return res;
-        }
+        //    return res;
+        //}
 
         private bool CheckNumOnley(string str)
         {
@@ -435,17 +304,17 @@ namespace SeLiap
             return true;
         }
 
-        private void AddLog( string text )
-        {
-            var rtb = richTextBox2;
+        //private void AddLog( string text )
+        //{
+        //    var rtb = richTextBox2;
 
-            rtb.Text += text + "\n";
+        //    rtb.Text += text + "\n";
 
-            rtb.SelectionStart = rtb.Text.Length; //カレット位置を末尾に移動
-            rtb.Focus(); //テキストボックスにフォーカスを移動
-            rtb.ScrollToCaret();//カレット位置までスクロール
+        //    rtb.SelectionStart = rtb.Text.Length; //カレット位置を末尾に移動
+        //    rtb.Focus(); //テキストボックスにフォーカスを移動
+        //    rtb.ScrollToCaret();//カレット位置までスクロール
 
-        }
+        //}
 
         object target_control = null;
         private void textBox1_Click(object sender, EventArgs e)

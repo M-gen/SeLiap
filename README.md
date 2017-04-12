@@ -11,7 +11,7 @@ Windows7 - VisualStudio2015 C#
 Python 3.5.1 (バッチ処理用、ビルドには依存しない)
 
 ## 利用しているもの
-+ (予定)IronPython
++ IronPython
 
 ## ライセンスについて
 
@@ -26,4 +26,4 @@ TOL_SRPGの著作権は、Ｍ－ｇｅｎが保持します
 
 ### 依存
 
-+ (予定)IronPython
++ IronPython
