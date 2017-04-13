@@ -105,6 +105,9 @@ namespace SeLiap
         string config_file = @"config.txt";
         PublicityLog log;
 
+        ContextMenuStrip rich_text_box_context_menu = new ContextMenuStrip();
+        ContextMenuStrip data_grid_view_context_menu = new ContextMenuStrip();
+
         public Form1()
         {
             InitializeComponent();
@@ -137,7 +140,12 @@ namespace SeLiap
 
             log = new PublicityLog(richTextBox2);
 
-            //Analyze(@"http://www.nicovideo.jp/watch/sm30944626?vid=xxx&xxxxxx&yyyy");
+            rich_text_box_context_menu.Items.Add( "コピー", null, RitchTextBox_ContextMenu_Click_Copy);
+            rich_text_box_context_menu.Items.Add( "全てコピー", null, RitchTextBox_ContextMenu_Click_CopyAll);
+
+            data_grid_view_context_menu.Items.Add("コピー", null,         DataGridView_ContextMenu_Click_Copy);
+            data_grid_view_context_menu.Items.Add("列を全てコピー", null, DataGridView_ContextMenu_Click_CopyVLine);
+
         }
 
         private void Analyze( string url_source )
@@ -209,112 +217,7 @@ namespace SeLiap
         {
             ReAnalyze();
         }
-
-        //private string GetEndcode( string src )
-        //{
-        //    string res = "";
-
-        //    var size = src.Length;
-        //    for (var i = 0; i < size; i++)
-        //    {
-        //        var pos = i;
-        //        if (src.Substring(pos, 1) == "\\")
-        //        {
-        //            if (src.Substring(pos, 2) == "\\u")
-        //            {
-
-        //                var s = src.Substring(pos + 2, 4);
-        //                int code16 = Convert.ToInt32(s, 16);
-        //                char c = Convert.ToChar(code16);  // 数値(文字コード) -> 文字
-        //                string new_char = c.ToString();
-        //                res += new_char;
-        //                i += 5;
-        //            }
-        //            else if (src.Substring(pos, 2) == "\\/")
-        //            {
-        //                res += @"/";
-        //                i += 1;
-        //            }
-        //            else if (src.Substring(pos, 2) == "\\\\")
-        //            {
-        //                res += @"\";
-        //                i += 1;
-        //            }
-        //            else
-        //            {
-        //                //Console.WriteLine("err " + src);
-        //                //richTextBox2.Text += "解析できない宣伝者名がありました " + src;
-        //                AddLog("解析できない宣伝者名がありました " + src);
-        //                res += @"/";
-        //                i += 1;
-        //            }
-        //        }
-        //        else if (src.Substring(pos, 1) == "&")
-        //        {
-        //            if (src.Substring(pos, 5) == "&amp;")
-        //            {
-        //                res += @"&";
-        //                i += 4;
-        //            }
-        //            else if (src.Substring(pos, 6) == "&quot;")
-        //            {
-        //                res += "\"";
-        //                i += 5;
-        //            }
-        //            else if (src.Substring(pos, 6) == "&#039;")
-        //            {
-        //                res += "'";
-        //                i += 5;
-        //            }
-        //            else
-        //            {
-        //                // todo:err
-        //                res += @"&";
-        //                i += 0;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            res += src.Substring(pos, 1);
-        //        }
-        //    }
-
-        //    return res;
-        //}
-
-        private bool CheckNumOnley(string str)
-        {
-            char[] ok_list = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-
-            if (str.Length == 0) return false;
-
-            foreach ( var s1 in str)
-            {
-                bool is_ok = false;
-                foreach ( var s2 in ok_list )
-                {
-                    if (s1 == s2)
-                    {
-                        is_ok = true;
-                        break;
-                    }
-                }
-                if(is_ok==false) return false;
-            }
-            return true;
-        }
-
-        //private void AddLog( string text )
-        //{
-        //    var rtb = richTextBox2;
-
-        //    rtb.Text += text + "\n";
-
-        //    rtb.SelectionStart = rtb.Text.Length; //カレット位置を末尾に移動
-        //    rtb.Focus(); //テキストボックスにフォーカスを移動
-        //    rtb.ScrollToCaret();//カレット位置までスクロール
-
-        //}
+        
 
         object target_control = null;
         private void textBox1_Click(object sender, EventArgs e)
@@ -408,6 +311,67 @@ namespace SeLiap
             {
                 return new System.Text.RegularExpressions.Regex("^[\u0020-\u007E\uFF66-\uFF9F]+$").IsMatch(target);
             }
+        }
+
+        private void RitchTextBox_ContextMenu_Click_Copy(object sender, EventArgs e)
+        {
+            var text = richTextBox1.SelectedText;
+            if (text == "") return;
+            Clipboard.SetText(text);
+        }
+
+        private void RitchTextBox_ContextMenu_Click_CopyAll(object sender, EventArgs e)
+        {
+            var text = richTextBox1.Text;
+            if (text == "") return;
+            Clipboard.SetText(text);
+            richTextBox1.SelectAll();
+        }
+
+        private void richTextBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var p = System.Windows.Forms.Cursor.Position;
+                rich_text_box_context_menu.Show(p);
+            }
+
+        }
+
+        private void DataGridView_ContextMenu_Click_Copy(object sender, EventArgs e)
+        {
+            var dgv = dataGridView1;
+            Clipboard.SetDataObject(dgv.GetClipboardContent());
+        }
+
+        private void DataGridView_ContextMenu_Click_CopyVLine(object sender, EventArgs e)
+        {
+            var dgv = dataGridView1;
+            if (dgv.SelectedCells.Count == 0) return;
+
+            var column_index = dgv.SelectedCells[0].ColumnIndex;
+            //var row_count = dgv.Rows.Count;
+
+            var text = "";
+            foreach (DataGridViewRow c in dgv.Rows)
+            {
+                if (text != "") text += "\n";
+                text += c.Cells[column_index].Value;
+            }
+            if (text != "")
+            {
+                Clipboard.SetText(text);
+            }
+        }
+
+        private void dataGridView1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var p = System.Windows.Forms.Cursor.Position;
+                data_grid_view_context_menu.Show(p);
+            }
+
         }
     }
 
