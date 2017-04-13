@@ -3,7 +3,7 @@ import shutil
 import os.path
 
 target_dir = "release/"
-new_dir_name = "ニコ動宣伝者リストアップ_0x00xXX"
+new_dir_name = "ニコ動宣伝者リストアップ_ver0x00xXX"
 main_target_dir = target_dir+new_dir_name+"/"
 
 if (os.path.exists(target_dir)==False):
