@@ -118,7 +118,7 @@ namespace SeLiap
                     log.WriteLine("データ数 " + jsonp_data.Count);
                     if (jsonp_data.Count == 1)
                     {
-                        if (jsonp_data[0].type == JSONPAnalyze.JSONP.Type.None)
+                        if (jsonp_data[0].value == null)
                         { // 中身がないのでキャンセル
                             return; 
                         }
