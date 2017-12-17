@@ -268,8 +268,6 @@ namespace SeLiap
         
         public JSONP Analyze( string data)
         {
-
-
             // 関数名と、外側の()を削除
             {
                 var i = data.IndexOf("(");
@@ -287,5 +285,14 @@ namespace SeLiap
             return jsonp;
         }
 
+        public JSONP AnalyzeByJSON(string data)
+        {
+            data = "\"\":" + data;
+            string rem_data;
+            var jsonp = new JSONP(data, out rem_data);
+
+
+            return jsonp;
+        }
     }
 }
