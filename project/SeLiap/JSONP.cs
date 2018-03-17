@@ -218,27 +218,28 @@ namespace SeLiap
                     }
                     else if (src.Substring(pos, 1) == "&")
                     {
-                        if (src.Substring(pos, 5)=="&amp;")
+                        // SubStringをそのまま使うと文字数が範囲を超えてエラーになるので、長さを確認したクッションの関数が必要
+                        if (SubStringEx(src,pos, 5) == "&amp;")
                         {
                             res += @"&";
                             i += 4;
                         }
-                        else if (src.Substring(pos, 6) == "&quot;")
+                        else if (SubStringEx(src, pos, 6) == "&quot;")
                         {
                             res += "\"";
                             i += 5;
                         }
-                        else if (src.Substring(pos, 4) == "&lt;")
+                        else if (SubStringEx(src, pos, 4) == "&lt;")
                         {
                             res += "<";
                             i += 3;
                         }
-                        else if (src.Substring(pos, 4) == "&gt;")
+                        else if (SubStringEx(src, pos, 4) == "&gt;")
                         {
                             res += ">";
                             i += 3;
                         }
-                        else if (src.Substring(pos, 6) == "&#039;")
+                        else if (SubStringEx( src, pos, 6) == "&#039;")
                         {
                             res += "'";
                             i += 5;
@@ -258,6 +259,20 @@ namespace SeLiap
 
                 return res;
             }
+        }
+
+        static private string SubStringEx( string src, int start, int length )
+        {
+            //if (src== "実況したい月読ショウタ&鏡音レン")
+            //{
+            //    var a = 0;
+            //}
+            if ( start+length > src.Count() )
+            {
+                length = src.Count() - start;
+            }
+            var res = src.Substring(start, length);
+            return res;
         }
 
         public string function_name = "";
