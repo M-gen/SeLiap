@@ -51,44 +51,6 @@
             Execute code within a given scope and converts result to a given type.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.CompiledCode.ExecuteAndWrap">
-            <summary>
-            Executes the code in an empty scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.CompiledCode.ExecuteAndWrap(Microsoft.Scripting.Hosting.ScriptScope)">
-            <summary>
-            Executes the code in the specified scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.CompiledCode.ExecuteAndWrap(System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Executes the code in an empty scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            
-            If an exception is thrown the exception is caught and an ObjectHandle to
-            the exception is provided.
-            </summary>
-            <remarks>
-            Use this API to handle non-serializable exceptions (exceptions might not be serializable due to security restrictions) 
-            or if an exception serialization loses information.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.CompiledCode.ExecuteAndWrap(Microsoft.Scripting.Hosting.ScriptScope,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Executes the expression in the specified scope and return a result.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            
-            If an exception is thrown the exception is caught and an ObjectHandle to
-            the exception is provided.
-            </summary>
-            <remarks>
-            Use this API to handle non-serializable exceptions (exceptions might not be serializable due to security restrictions) 
-            or if an exception serialization loses information.
-            </remarks>
-        </member>
         <member name="T:Microsoft.Scripting.Hosting.DocumentationOperations">
             <summary>
             Provides documentation against live objects for use in a REPL window.
@@ -102,16 +64,6 @@
         <member name="M:Microsoft.Scripting.Hosting.DocumentationOperations.GetOverloads(System.Object)">
             <summary>
             Gets the overloads available for the provided object if it is invokable.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.DocumentationOperations.GetMembers(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Gets the available members on the provided remote object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.DocumentationOperations.GetOverloads(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Gets the overloads available for the provided remote object if it is invokable.
             </summary>
         </member>
         <member name="T:Microsoft.Scripting.Hosting.ErrorListener">
@@ -548,282 +500,6 @@
             Returns a list of signatures applicable for calling the specified object in a form displayable to the user.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.IsCallable(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Returns true if the remote object is callable.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Invoke(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle[])">
-            <summary>
-            Invokes the specified remote object with the specified remote parameters.
-            
-            Though delegates are preferable for calls they may not always be usable for remote objects.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Invoke(System.Runtime.Remoting.ObjectHandle,System.Object[])">
-            <summary>
-            Invokes the specified remote object with the local parameters which will be serialized
-            to the remote app domain.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.CreateInstance(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle[])">
-            <summary>
-            Creates a new remote instance from the provided remote object using the given parameters, and returns the result.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.CreateInstance(System.Runtime.Remoting.ObjectHandle,System.Object[])">
-            <summary>
-            Creates a new remote instance from the provided remote object using the given parameters, and returns the result.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.SetMember(System.Runtime.Remoting.ObjectHandle,System.String,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Sets the remote object as a member on the provided remote object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.SetMember``1(System.Runtime.Remoting.ObjectHandle,System.String,``0)">
-            <summary>
-            Sets the member name on the remote object obj to value.  This overload can be used to avoid
-            boxing and casting of strongly typed members.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetMember(System.Runtime.Remoting.ObjectHandle,System.String)">
-            <summary>
-            Gets the member name on the remote object.  Throws an exception if the member is not defined or
-            is write-only.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetMember``1(System.Runtime.Remoting.ObjectHandle,System.String)">
-            <summary>
-            Gets the member name on the remote object.  Throws an exception if the member is not defined or
-            is write-only.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryGetMember(System.Runtime.Remoting.ObjectHandle,System.String,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Gets the member name on the remote object.  Returns false if the member is not defined or
-            is write-only.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ContainsMember(System.Runtime.Remoting.ObjectHandle,System.String)">
-            <summary>
-            Tests to see if the member name is defined on the remote object.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.RemoveMember(System.Runtime.Remoting.ObjectHandle,System.String)">
-            <summary>
-            Removes the member from the remote object
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ConvertTo``1(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Converts the remote object into the specified type returning a handle to
-            the new remote object. The conversion will be explicit or implicit depending on 
-            what the langauge prefers.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ConvertTo(System.Runtime.Remoting.ObjectHandle,System.Type)">
-            <summary>
-            Converts the remote object into the specified type returning a handle to
-            the new remote object. The conversion will be explicit or implicit depending on 
-            what the langauge prefers.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryConvertTo``1(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Converts the remote object into the specified type returning a handle to
-            the new remote object. Returns true if the value can be converted,
-            false if it cannot. The conversion will be explicit or implicit depending on 
-            what the langauge prefers.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryConvertTo(System.Runtime.Remoting.ObjectHandle,System.Type,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Converts the remote object into the specified type returning a handle to
-            the new remote object. Returns true if the value can be converted,
-            false if it cannot. The conversion will be explicit or implicit depending on 
-            what the langauge prefers.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ExplicitConvertTo``1(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Converts the object obj to the type T including explicit conversions which may lose information.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ExplicitConvertTo(System.Runtime.Remoting.ObjectHandle,System.Type)">
-            <summary>
-            Converts the object obj to the type type including explicit conversions which may lose information.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryExplicitConvertTo``1(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Converts the object obj to the type T including explicit conversions which may lose information.
-            
-            Returns true if the value can be converted, false if it cannot.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryExplicitConvertTo(System.Runtime.Remoting.ObjectHandle,System.Type,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Converts the object obj to the type type including explicit conversions which may lose information.  
-            
-            Returns true if the value can be converted, false if it cannot.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ImplicitConvertTo``1(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Converts the object obj to the type T including implicit conversions.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ImplicitConvertTo(System.Runtime.Remoting.ObjectHandle,System.Type)">
-            <summary>
-            Converts the object obj to the type type including implicit conversions.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryImplicitConvertTo``1(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Converts the object obj to the type T including implicit conversions.
-            
-            Returns true if the value can be converted, false if it cannot.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.TryImplicitConvertTo(System.Runtime.Remoting.ObjectHandle,System.Type,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Converts the object obj to the type type including implicit conversions.  
-            
-            Returns true if the value can be converted, false if it cannot.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Unwrap``1(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Unwraps the remote object and converts it into the specified type before
-            returning it.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(System.Linq.Expressions.ExpressionType,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Performs the specified unary operator on the remote object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(System.Linq.Expressions.ExpressionType,System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Performs the specified binary operator on the remote object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Add(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Adds the two remote objects.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Subtract(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Subtracts the 1st remote object from the second.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Power(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Raises the 1st remote object to the power of the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Multiply(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Multiplies the two remote objects.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Divide(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Divides the 1st remote object by the 2nd. Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Modulo(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Performs modulus on the 1st remote object by the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>        
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.LeftShift(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Shifts the 1st remote object left by the 2nd remote object.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.RightShift(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Shifts the 1st remote  object right by the 2nd remote object.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.BitwiseAnd(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Performs bitwise-and on the two remote objects.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.BitwiseOr(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Performs bitwise-or on the two remote objects.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.ExclusiveOr(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Performs exclusive-or on the two remote objects.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.LessThan(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Compares the two remote objects and returns true if the 1st is less than the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GreaterThan(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Compares the two remote objects and returns true if the 1st is greater than the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.LessThanOrEqual(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Compares the two remote objects and returns true if the 1st is less than or equal to the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GreaterThanOrEqual(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Compares the two remote objects and returns true if the 1st is greater than or equal to than the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Equal(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Compares the two remote objects and returns true if the 1st is equal to the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.NotEqual(System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Compares the two remote objects and returns true if the 1st is not equal to the 2nd.  Throws an exception if the operation cannot be performed.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.Format(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Returns a string representation of the object in a langauge specific object display format.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetMemberNames(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Returns a list of strings which contain the known members of the remote object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetDocumentation(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Returns a string providing documentation for the specified remote object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetCallSignatures(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Returns a list of signatures applicable for calling the specified object in a form displayable to the user.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetLocalObject(System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Helper to unwrap an object - in the future maybe we should validate the current app domain.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.GetLocalObjects(System.Runtime.Remoting.ObjectHandle[])">
-            <summary>
-            Helper to unwrap multiple objects
-            </summary>
-        </member>
         <member name="T:Microsoft.Scripting.Hosting.OverloadDoc">
             <summary>
             Provides documentation for a single overload of an invokable object.
@@ -1007,44 +683,6 @@
             <exception cref="T:System.NotSupportedException">The engine doesn't support code execution.</exception>
             <exception cref="T:System.ArgumentNullException"><paramref name="path"/> is a <c>null</c> reference.</exception>
             <exception cref="T:System.ArgumentNullException"><paramref name="scope"/> is a <c>null</c> reference.</exception>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.ExecuteAndWrap(System.String,Microsoft.Scripting.Hosting.ScriptScope)">
-            <summary>
-            Executes the expression in the specified scope and return a result.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.ExecuteAndWrap(System.String)">
-            <summary>
-            Executes the code in an empty scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.ExecuteAndWrap(System.String,Microsoft.Scripting.Hosting.ScriptScope,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Executes the expression in the specified scope and return a result.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            
-            If an exception is thrown the exception is caught and an ObjectHandle to
-            the exception is provided.
-            </summary>
-            <remarks>
-            Use this API in case the exception is not serializable (for example, due to security restrictions) or its serialization 
-            loses information that you need to access.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.ExecuteAndWrap(System.String,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Executes the code in an empty scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            
-            If an exception is thrown the exception is caught and an ObjectHandle to
-            the exception is provided.
-            </summary>
-            <remarks>
-            Use this API in case the exception is not serializable (for example, due to security restrictions) or its serialization 
-            loses information that you need to access.
-            </remarks>
         </member>
         <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.CreateScope">
             <summary>
@@ -1358,13 +996,6 @@
             (using System.Configuration).
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptRuntime.CreateRemote(System.AppDomain,Microsoft.Scripting.Hosting.ScriptRuntimeSetup)">
-            <summary>
-            Creates ScriptRuntime in the current app-domain and initialized according to the the specified settings.
-            Creates an instance of host class specified in the setup and associates it with the created runtime.
-            Both Runtime and ScriptHost are collocated in the specified app-domain.
-            </summary>
-        </member>
         <member name="M:Microsoft.Scripting.Hosting.ScriptRuntime.GetEngineByFileExtension(System.String)">
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
@@ -1459,16 +1090,6 @@
             If there is no configuration available returns an empty setup.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptRuntimeSetup.ReadConfiguration(System.IO.Stream)">
-            <summary>
-            Reads setup from a specified XML stream.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptRuntimeSetup.ReadConfiguration(System.String)">
-            <summary>
-            Reads setup from a specified XML file.
-            </summary>
-        </member>
         <member name="T:Microsoft.Scripting.Hosting.ScriptScope">
              <summary>
              A ScriptScope is a unit of execution for code.  It consists of a global Scope which
@@ -1522,29 +1143,6 @@
             Sets the name to the specified value.
             </summary>
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is a <c>null</c> reference.</exception>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptScope.GetVariableHandle(System.String)">
-            <summary>
-            Gets a handle for a value stored in the scope under the given name.
-            </summary>
-            <exception cref="T:System.MissingMemberException">The specified name is not defined in the scope.</exception>
-            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is a <c>null</c> reference.</exception>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptScope.TryGetVariableHandle(System.String,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Tries to get a handle for a value stored in the scope under the given name.
-            Returns <c>true</c> if there is such name, <c>false</c> otherwise. 
-            </summary>
-            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is a <c>null</c> reference.</exception>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptScope.SetVariable(System.String,System.Runtime.Remoting.ObjectHandle)">
-            <summary>
-            Sets the name to the specified value.
-            </summary>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">
-            The value held by the handle isn't from the scope's app-domain and isn't serializable or MarshalByRefObject.
-            </exception>
-            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> or <paramref name="handle"/> is a <c>null</c> reference.</exception>
         </member>
         <member name="M:Microsoft.Scripting.Hosting.ScriptScope.ContainsVariable(System.String)">
             <summary>
@@ -1635,44 +1233,6 @@
             Executes the code in an empty scope and converts the result to the specified type.
             The conversion is language specific.
             </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptSource.ExecuteAndWrap">
-            <summary>
-            Executes the code in an empty scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptSource.ExecuteAndWrap(Microsoft.Scripting.Hosting.ScriptScope)">
-            <summary>
-            Executes the code in the specified scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptSource.ExecuteAndWrap(System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Executes the code in an empty scope.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            
-            If an exception is thrown the exception is caught and an ObjectHandle to
-            the exception is provided.
-            </summary>
-            <remarks>
-            Use this API to handle non-serializable exceptions (exceptions might not be serializable due to security restrictions) 
-            or if an exception serialization loses information.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.Scripting.Hosting.ScriptSource.ExecuteAndWrap(Microsoft.Scripting.Hosting.ScriptScope,System.Runtime.Remoting.ObjectHandle@)">
-            <summary>
-            Executes the expression in the specified scope and return a result.
-            Returns an ObjectHandle wrapping the resulting value of running the code.  
-            
-            If an exception is thrown the exception is caught and an ObjectHandle to
-            the exception is provided.
-            </summary>
-            <remarks>
-            Use this API to handle non-serializable exceptions (exceptions might not be serializable due to security restrictions) 
-            or if an exception serialization loses information.
-            </remarks>
         </member>
         <member name="M:Microsoft.Scripting.Hosting.ScriptSource.ExecuteProgram">
             <summary>

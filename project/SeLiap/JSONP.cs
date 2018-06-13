@@ -190,21 +190,22 @@ namespace SeLiap
                     var pos = i;
                     if (src.Substring(pos, 1) == "\\")
                     {
-                        if (src.Substring(pos, 2) == "\\u")
+                        // SubStringをそのまま使うと文字数が範囲を超えてエラーになるので、長さを確認したクッションの関数が必要
+                        if (SubStringEx(src, pos, 2) == "\\u")
                         {
-                            var s = src.Substring(pos + 2, 4);
+                            var s = SubStringEx(src, pos + 2, 4);
                             int code16 = Convert.ToInt32(s, 16);
                             char c = Convert.ToChar(code16);  // 数値(文字コード) -> 文字
                             string new_char = c.ToString();
                             res += new_char;
                             i += 5;
                         }
-                        else if (src.Substring(pos, 2) == "\\/")
+                        else if (SubStringEx(src, pos, 2) == "\\/")
                         {
                             res += @"/";
                             i += 1;
                         }
-                        else if (src.Substring(pos, 2) == "\\\\")
+                        else if (SubStringEx(src, pos, 2) == "\\\\")
                         {
                             res += @"\";
                             i += 1;
