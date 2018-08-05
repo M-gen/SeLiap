@@ -81,72 +81,75 @@ namespace SeLiap
             publicitys.Clear();
 
             GetStatus_2017_1212(vid);
-            GetStatus_2017_1212_Befor(vid);
+            //GetStatus_2017_1212_Befor(vid);
         }
 
-        protected void GetStatus_2017_1212_Befor( string vid)
-        {
-            // 2017.12/12以前の情報を受け取る
-            var offset = 0;
-            var page_limit = 100;
-            while (true)
-            {
-                var content = GetJSONPDataByWebAPI_old(vid, offset, page_limit);
-                var ja = new JSONPAnalyze();
-                var jsonp = ja.Analyze(content);
+        // 旧宣伝者ログの取得はcsv形式で別のAPIとなった
+        // ただ、今回は暫定でそれは未対応で、現状のAPIの接続を省略するだけにしておく → 対応が必要かどうか検討中
 
-                try
-                {
-                    dynamic jsonp_meta = jsonp.value["meta"].value;
+        //protected void GetStatus_2017_1212_Befor( string vid)
+        //{
+        //    // 2017.12/12以前の情報を受け取る
+        //    var offset = 0;
+        //    var page_limit = 100;
+        //    while (true)
+        //    {
+        //        var content = GetJSONPDataByWebAPI_old(vid, offset, page_limit);
+        //        var ja = new JSONPAnalyze();
+        //        var jsonp = ja.Analyze(content);
 
-                    if ((jsonp_meta["status"].value == 200) && (jsonp_meta["message"].value == "succeed"))
-                    {
-                        log.WriteLine("データ取得成功");
+        //        try
+        //        {
+        //            dynamic jsonp_meta = jsonp.value["meta"].value;
 
-                    }
-                    else
-                    {
-                        log.WriteLine("データ取得失敗 A");
-                        return;
-                    }
+        //            if ((jsonp_meta["status"].value == 200) && (jsonp_meta["message"].value == "succeed"))
+        //            {
+        //                log.WriteLine("データ取得成功");
+
+        //            }
+        //            else
+        //            {
+        //                log.WriteLine("データ取得失敗 A");
+        //                return;
+        //            }
 
 
-                }
-                catch
-                {
-                    log.WriteLine("データ取得失敗 B");
-                    return;
-                }
+        //        }
+        //        catch
+        //        {
+        //            log.WriteLine("データ取得失敗 B");
+        //            return;
+        //        }
 
-                try
-                {
-                    dynamic jsonp_data = jsonp.value["data"].value;
-                    log.WriteLine("データ数 " + jsonp_data.Count);
-                    if (jsonp_data.Count == 1)
-                    {
-                        if (jsonp_data[0].value == null)
-                        { // 中身がないのでキャンセル
-                            return;
-                        }
-                    }
+        //        try
+        //        {
+        //            dynamic jsonp_data = jsonp.value["data"].value;
+        //            log.WriteLine("データ数 " + jsonp_data.Count);
+        //            if (jsonp_data.Count == 1)
+        //            {
+        //                if (jsonp_data[0].value == null)
+        //                { // 中身がないのでキャンセル
+        //                    return;
+        //                }
+        //            }
 
-                    foreach (var j in jsonp_data)
-                    {
-                        var name = j.value["name"].value;
-                        var comment = j.value["campaignname"].value;
-                        var item = new PublicityData(name, comment);
-                        none_effect_publicitys.Add(item);
-                    }
-                }
-                catch
-                {
-                    return;
-                }
+        //            foreach (var j in jsonp_data)
+        //            {
+        //                var name = j.value["name"].value;
+        //                var comment = j.value["campaignname"].value;
+        //                var item = new PublicityData(name, comment);
+        //                none_effect_publicitys.Add(item);
+        //            }
+        //        }
+        //        catch
+        //        {
+        //            return;
+        //        }
 
-                offset += page_limit;
-                MyLauncher.WaitSleep.Do(10);
-            }
-        }
+        //        offset += page_limit;
+        //        MyLauncher.WaitSleep.Do(10);
+        //    }
+        //}
 
         protected void GetStatus_2017_1212(string vid)
         {
@@ -209,23 +212,23 @@ namespace SeLiap
             }
         }
 
-        protected string GetJSONPDataByWebAPI_old( string vid, int offset, int page_limit)
-        {
-            var url = string.Format(@"http://uad-api.nicovideo.jp/UadsCampaignService/getAdHistoryJsonp?vid={0}&offset={1}&limit={2}", vid, offset, page_limit);
-            log.WriteLine(url);
+        //protected string GetJSONPDataByWebAPI_old( string vid, int offset, int page_limit)
+        //{
+        //    var url = string.Format(@"http://uad-api.nicovideo.jp/UadsCampaignService/getAdHistoryJsonp?vid={0}&offset={1}&limit={2}", vid, offset, page_limit);
+        //    log.WriteLine(url);
 
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-            req.Method = "GET";
-            //req.Method = "PUSH";
+        //    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+        //    req.Method = "GET";
+        //    //req.Method = "PUSH";
 
-            HttpWebResponse res = (HttpWebResponse)req.GetResponse();
+        //    HttpWebResponse res = (HttpWebResponse)req.GetResponse();
 
-            Stream s = res.GetResponseStream();
-            StreamReader sr = new StreamReader(s);
-            string content = sr.ReadToEnd();
+        //    Stream s = res.GetResponseStream();
+        //    StreamReader sr = new StreamReader(s);
+        //    string content = sr.ReadToEnd();
 
-            return content;
-        }
+        //    return content;
+        //}
 
         // 取得方法が異なるので
         protected string GetJSONPDataByWebAPI_ver2017_1212(string vid, int offset, int page_limit)
