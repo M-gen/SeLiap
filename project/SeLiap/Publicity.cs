@@ -8,6 +8,10 @@ using System.Windows.Forms;
 
 using System.Net;
 using System.IO;
+using System.Xml;
+
+
+using CSV;
 
 namespace SeLiap
 {
@@ -81,75 +85,77 @@ namespace SeLiap
             publicitys.Clear();
 
             GetStatus_2017_1212(vid);
-            //GetStatus_2017_1212_Befor(vid);
+            GetStatus_2017_1212_Befor(vid);
         }
 
-        // 旧宣伝者ログの取得はcsv形式で別のAPIとなった
-        // ただ、今回は暫定でそれは未対応で、現状のAPIの接続を省略するだけにしておく → 対応が必要かどうか検討中
+        // 2017.12/12以前の情報を受け取る
+        protected void GetStatus_2017_1212_Befor(string vid)
+        {
+            // まずは、動画の基本情報を取得する
+            // 日付の確認をする
+            var url = $"http://ext.nicovideo.jp/api/getthumbinfo/{vid}";
+            var req = (HttpWebRequest)WebRequest.Create(url);
+            req.Method = "GET";
+            var res = (HttpWebResponse)req.GetResponse();
+            var s = res.GetResponseStream();
+            var sr = new StreamReader(s);
+            var content = sr.ReadToEnd();
 
-        //protected void GetStatus_2017_1212_Befor( string vid)
-        //{
-        //    // 2017.12/12以前の情報を受け取る
-        //    var offset = 0;
-        //    var page_limit = 100;
-        //    while (true)
-        //    {
-        //        var content = GetJSONPDataByWebAPI_old(vid, offset, page_limit);
-        //        var ja = new JSONPAnalyze();
-        //        var jsonp = ja.Analyze(content);
+            //Console.WriteLine(content);
+            // XML解析
+            var doc = new XmlDocument();
+            doc.Load(new StringReader(content));
+            var root = doc.DocumentElement;
+            // 日付
+            var date_string = root.SelectSingleNode("thumb/first_retrieve").InnerText;
+            var year = int.Parse(date_string.Substring(0, 4));
+            var month = int.Parse(date_string.Substring(5, 2));
+            var day = int.Parse(date_string.Substring(8, 2));
+            var time1 = new DateTime(year, month, day);
+            var time2 = new DateTime(2017, 12, 20);
 
-        //        try
-        //        {
-        //            dynamic jsonp_meta = jsonp.value["meta"].value;
+            var is_ok = false;
+            if (time1 <= time2)
+            {
+                is_ok = true;
+            }
+            if (!is_ok)
+            {
+                return;
+            }
 
-        //            if ((jsonp_meta["status"].value == 200) && (jsonp_meta["message"].value == "succeed"))
-        //            {
-        //                log.WriteLine("データ取得成功");
+            try
+            {
+                // 日付が確定なら
+                // CSVのダウンロード
+                url = $"https://secure-dcdn.cdn.nimg.jp/nicoad/res/old-video-comments/{vid}.csv";
+                req = (HttpWebRequest)WebRequest.Create(url);
+                req.Method = "GET";
+                res = (HttpWebResponse)req.GetResponse();
+                s = res.GetResponseStream();
+                sr = new StreamReader(s);
+                content = sr.ReadToEnd();
+                Console.WriteLine(content);
 
-        //            }
-        //            else
-        //            {
-        //                log.WriteLine("データ取得失敗 A");
-        //                return;
-        //            }
+                // CSVの解析
+                var csv_analyze = new CSVAnalyze(content);
 
-
-        //        }
-        //        catch
-        //        {
-        //            log.WriteLine("データ取得失敗 B");
-        //            return;
-        //        }
-
-        //        try
-        //        {
-        //            dynamic jsonp_data = jsonp.value["data"].value;
-        //            log.WriteLine("データ数 " + jsonp_data.Count);
-        //            if (jsonp_data.Count == 1)
-        //            {
-        //                if (jsonp_data[0].value == null)
-        //                { // 中身がないのでキャンセル
-        //                    return;
-        //                }
-        //            }
-
-        //            foreach (var j in jsonp_data)
-        //            {
-        //                var name = j.value["name"].value;
-        //                var comment = j.value["campaignname"].value;
-        //                var item = new PublicityData(name, comment);
-        //                none_effect_publicitys.Add(item);
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            return;
-        //        }
-
-        //        offset += page_limit;
-        //        MyLauncher.WaitSleep.Do(10);
-        //    }
-        //}
+                // 解析結果を適応する
+                foreach (var tmp in csv_analyze.lines)
+                {
+                    if (tmp.items[0] != "")
+                    {
+                        var item = new PublicityData(tmp.items[0], tmp.items[1]);
+                        none_effect_publicitys.Add(item);
+                    }
+                }
+                log.WriteLine("2017年12月20日以前の広告者データをCSVとして取得しました");
+            }
+            catch
+            {
+                log.WriteLine("2017年12月20日以前の広告者データ(CSV)はありません");
+            }
+        }
 
         protected void GetStatus_2017_1212(string vid)
         {
