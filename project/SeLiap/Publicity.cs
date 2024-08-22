@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using System.Xml;
-
+using HtmlAgilityPack;
 
 using CSV;
 
@@ -91,50 +91,65 @@ namespace SeLiap
         // 2017.12/12以前の情報を受け取る
         protected void GetStatus_2017_1212_Befor(string vid)
         {
-            // まずは、動画の基本情報を取得する
-            // 日付の確認をする
-            var url = $"http://ext.nicovideo.jp/api/getthumbinfo/{vid}";
-            var req = (HttpWebRequest)WebRequest.Create(url);
-            req.Method = "GET";
-            var res = (HttpWebResponse)req.GetResponse();
-            var s = res.GetResponseStream();
-            var sr = new StreamReader(s);
-            var content = sr.ReadToEnd();
-
-            //Console.WriteLine(content);
-            // XML解析
-            var doc = new XmlDocument();
-            doc.Load(new StringReader(content));
-            var root = doc.DocumentElement;
-            // 日付
-            var date_string = root.SelectSingleNode("thumb/first_retrieve").InnerText;
-            var year = int.Parse(date_string.Substring(0, 4));
-            var month = int.Parse(date_string.Substring(5, 2));
-            var day = int.Parse(date_string.Substring(8, 2));
-            var time1 = new DateTime(year, month, day);
-            var time2 = new DateTime(2017, 12, 20);
-
-            var is_ok = false;
-            if (time1 <= time2)
+            // 日付を確認する
             {
-                is_ok = true;
-            }
-            if (!is_ok)
-            {
-                return;
+                var url = $"http://ext.nicovideo.jp/api/getthumbinfo/{vid}";
+                var req = (HttpWebRequest)WebRequest.Create(url);
+                req.Method = "GET";
+                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36";
+                req.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
+                req.Headers.Add("Accept-Language", "ja-JP,ja;q=0.9,en-US;q=0.8,en;q=0.7");
+                var res = (HttpWebResponse)req.GetResponse();
+                var s = res.GetResponseStream();
+                var sr = new StreamReader(s);
+                var content = sr.ReadToEnd();
+                var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+                htmlDoc.Load(new StringReader(content));
+                var dateNode = htmlDoc.DocumentNode.SelectSingleNode("*//first_retrieve");
+
+                if (dateNode != null)
+                {
+                    // 日付を抽出
+                    var date_string = dateNode.InnerText;
+
+                    // 日付文字列が正しい形式であることを確認しつつパース
+                    var year = int.Parse(date_string.Substring(0, 4));
+                    var month = int.Parse(date_string.Substring(5, 2));
+                    var day = int.Parse(date_string.Substring(8, 2));
+                    var time1 = new DateTime(year, month, day);
+                    var time2 = new DateTime(2017, 12, 20);
+
+                    // 日付を比較または他の処理を行う
+                    Console.WriteLine("Parsed Date: " + time1.ToString("yyyy-MM-dd"));
+                    Console.WriteLine("Comparison Date: " + time2.ToString("yyyy-MM-dd"));
+
+                    var is_ok = false;
+                    if (time1 <= time2)
+                    {
+                        is_ok = true;
+                    }
+                    if (!is_ok)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
 
             try
             {
                 // 日付が確定なら
                 // CSVのダウンロード
-                url = $"https://secure-dcdn.cdn.nimg.jp/nicoad/res/old-video-comments/{vid}.csv";
-                req = (HttpWebRequest)WebRequest.Create(url);
+                var url = $"https://secure-dcdn.cdn.nimg.jp/nicoad/res/old-video-comments/{vid}.csv";
+                var req = (HttpWebRequest)WebRequest.Create(url);
                 req.Method = "GET";
-                res = (HttpWebResponse)req.GetResponse();
-                s = res.GetResponseStream();
-                sr = new StreamReader(s);
-                content = sr.ReadToEnd();
+                var res = (HttpWebResponse)req.GetResponse();
+                var s = res.GetResponseStream();
+                var sr = new StreamReader(s);
+                var content = sr.ReadToEnd();
                 Console.WriteLine(content);
 
                 // CSVの解析
@@ -217,24 +232,6 @@ namespace SeLiap
                 MyLauncher.WaitSleep.Do(10);
             }
         }
-
-        //protected string GetJSONPDataByWebAPI_old( string vid, int offset, int page_limit)
-        //{
-        //    var url = string.Format(@"http://uad-api.nicovideo.jp/UadsCampaignService/getAdHistoryJsonp?vid={0}&offset={1}&limit={2}", vid, offset, page_limit);
-        //    log.WriteLine(url);
-
-        //    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-        //    req.Method = "GET";
-        //    //req.Method = "PUSH";
-
-        //    HttpWebResponse res = (HttpWebResponse)req.GetResponse();
-
-        //    Stream s = res.GetResponseStream();
-        //    StreamReader sr = new StreamReader(s);
-        //    string content = sr.ReadToEnd();
-
-        //    return content;
-        //}
 
         // 取得方法が異なるので
         protected string GetJSONPDataByWebAPI_ver2017_1212(string vid, int offset, int page_limit)
